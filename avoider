@@ -1,0 +1,227 @@
+#define pingPinl A2 // Trigger Pin of Ultrasonic Sensor
+int echoPinl = 6; // Echo Pin of Ultrasonic Sensor
+int pingPinr = 12; // Trigger Pin of Ultrasonic Sensor
+int echoPinr = 2; // Echo Pin of Ultrasonic Sensor
+int pingPinm = 4; // Trigger Pin of Ultrasonic Sensor
+int echoPinm = 8; // Echo Pin of Ultrasonic Senso
+int enl= 7;
+int enr = 3;
+int enm = 5;
+#define LM1 A0
+#define LM2 A1
+int RM1 = 10;
+int RM2 = 11;
+int MM1 = 13;
+int MM2 = 9;
+void setup() {
+
+  // put your setup code here, to run once:
+  pinMode(LM1, OUTPUT);
+  pinMode(LM2, OUTPUT);
+  pinMode(RM1, OUTPUT);
+  pinMode(RM2, OUTPUT);
+  pinMode(MM1, OUTPUT);
+  pinMode(MM2, OUTPUT);
+  pinMode(enr, OUTPUT);
+  pinMode(enm, OUTPUT);
+  pinMode(pingPinl, OUTPUT);
+  pinMode(echoPinl, INPUT);
+  pinMode(pingPinr, OUTPUT);
+  pinMode(echoPinr, INPUT);
+  pinMode(pingPinm, OUTPUT);
+  pinMode(echoPinm, INPUT);
+  Serial.begin(9600);
+}
+//int a, b, c, d, e, f;
+
+void gummright()
+{
+    digitalWrite(RM1, 0);
+    digitalWrite(RM2, 1);
+    digitalWrite(MM1, 0);
+    digitalWrite(MM2, 1);
+    delay(600);
+    digitalWrite(RM1, 0);
+    digitalWrite(RM2, 0);
+}
+void gummleft()
+{
+    digitalWrite(LM1, 0);
+    digitalWrite(LM2, 1);
+ 
+    digitalWrite(MM1, 0);
+    digitalWrite(MM2, 1);
+    delay(600);
+    digitalWrite(MM1, 0);
+    digitalWrite(MM2, 0);
+}
+void gummmid()
+{
+ digitalWrite(LM1, 0);
+    digitalWrite(LM2, 1);
+    digitalWrite(RM1, 0);
+    digitalWrite(RM2, 1);
+    delay(600);
+    digitalWrite(LM1, 0);
+    digitalWrite(LM2, 0);
+}
+void loop() {
+   long cml,cmr,cmm;
+  
+  cml = seansorreadleft();
+  cmr = seansorreadright();
+  cmm = seansorreadmid();
+  if (cmr < 20) {
+    analogWrite(enl, 255);
+    analogWrite(enm, 255);
+    analogWrite(enr, 255);
+    digitalWrite(LM1, 0);
+    digitalWrite(LM2, 0);
+    digitalWrite(RM1, 0);
+    digitalWrite(RM2, 1);
+    digitalWrite(MM1, 1);
+    digitalWrite(MM2, 0);
+    delay(700);
+    gummright();
+   while(cml>20 )
+   {
+ 
+   cml = seansorreadleft();
+     digitalWrite(LM1, 0);
+    digitalWrite(LM2, 1);
+    digitalWrite(MM1, 1);
+    digitalWrite(MM2, 0);
+   }
+
+
+  }
+  else if (cml < 20) {
+    analogWrite(enr, 255);
+    analogWrite(enm, 255);
+    analogWrite(enl, 255);
+    digitalWrite(LM1, 1);
+    digitalWrite(LM2, 0);
+    digitalWrite(RM1, 0);
+    digitalWrite(RM2, 0);
+    digitalWrite(MM1, 0);
+    digitalWrite(MM2, 1);
+    delay(700);
+    gummleft();
+    while( cmm>20 )
+    {
+    
+  cmm= seansorreadmid();
+  
+      digitalWrite(RM1, 0);
+    digitalWrite(RM2, 1);
+    digitalWrite(LM1, 1);
+    digitalWrite(LM2, 0);
+    }
+
+  }
+  else if (cmm < 20) {
+    analogWrite(enl, 255);
+    analogWrite(enr, 255);
+    analogWrite(enm, 255);
+    digitalWrite(LM1, 0);
+    digitalWrite(LM2, 1);
+    digitalWrite(RM1, 1);
+    digitalWrite(RM2, 0);
+    digitalWrite(MM1, 0);
+    digitalWrite(MM2, 0);
+    delay(700);
+    gummmid();
+    while( cmr > 20)
+    {
+      cmr=  seansorreadright();
+
+      digitalWrite(MM1, 0);
+    digitalWrite(MM2, 1);
+    digitalWrite(RM1, 1);
+    digitalWrite(RM2, 0);
+    }
+    }
+
+  
+  else
+  {
+    analogWrite(enl, 0);
+    analogWrite(enr, 0);
+    analogWrite(enm, 0);
+    digitalWrite(LM1, 0);
+    digitalWrite(LM2, 0);
+    digitalWrite(RM1, 0);
+    digitalWrite(RM2, 0);
+    digitalWrite(MM1, 0);
+    digitalWrite(MM2, 0);
+    delay(700);
+    
+  }
+
+/*
+   Serial.print("left");
+    Serial.print(cml  );
+    delay(100);
+    Serial.print("right");
+    Serial.print(cmr  );
+    delay(100);
+    Serial.print("mid");
+    Serial.print(cmm);
+
+    delay(1000);
+    Serial.println("");
+    */
+}
+
+long seansorreadleft()
+{
+long duration1, duration2, duration3, left ;
+
+
+  digitalWrite(pingPinl, LOW);
+  delayMicroseconds(2);
+  digitalWrite(pingPinl, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(pingPinl, LOW);
+  duration1 = pulseIn(echoPinl, HIGH);
+
+left = microsecondsToCentimeters(duration1);
+ 
+return left;
+ 
+
+  
+}
+long seansorreadright()
+{
+  long right, duration2;
+  digitalWrite(pingPinr, LOW);
+  delayMicroseconds(2);
+  digitalWrite(pingPinr, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(pingPinr, LOW);
+  duration2 = pulseIn(echoPinr, HIGH);
+  right = microsecondsToCentimeters(duration2);
+  return right;
+}
+long seansorreadmid()
+{
+  long mid, duration3;
+   digitalWrite(pingPinm, LOW);
+  delayMicroseconds(2);
+  digitalWrite(pingPinm, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(pingPinm, LOW);
+  duration3 = pulseIn(echoPinm, HIGH);
+  mid = microsecondsToCentimeters(duration3);
+  return mid;
+}
+long microsecondsToInches(long microseconds)
+{
+  return microseconds / 74 / 2;
+}
+
+long microsecondsToCentimeters(long microseconds)
+{
+  return microseconds / 29 / 2;
+}
